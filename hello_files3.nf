@@ -41,7 +41,7 @@ process greet_list {
   input: val words_in
   output: path 'words.out'
 
-  script:
+  shell:
     '''
     echo "greeting words: !{words_in}" > 'words.out'
     '''
