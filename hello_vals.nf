@@ -22,6 +22,16 @@ This script does not create any files explicitly, but just outputs the greetings
 
 process say_it {
 
+  // here we have one input channel and one output channel, but multiple 
+  //   channels of either can be specified; input channel is not required.
+
+  // input channel items are of type 'val' (value); that is, strings or numbers;
+  //   other common simple types are 'file' or (more flexible) 'path', for files
+  //   and the compound type of 'tuple' which is a list of other value types. 
+
+  // here, 'stdout' output captured from shell block and put in output channel
+  //   as a 'val' type; can also capture files/paths and compound types;
+
   input: val word
   output: stdout
 
@@ -35,7 +45,7 @@ process say_it {
 
   shell:
 
-    // groovy code can go here:
+    // groovy code can go here; '$' variable interpolation:
     println("say_it:groovy:word: $word")
 
     '''
@@ -45,8 +55,9 @@ process say_it {
     #   `word` is groovy variable; `whoami` is a bash command, and `PWD` is 
     #   a bash variable. The main command run here, is `echo`. You can
     #   run any command that would be available on the command line.
-    
-    echo "!{word} world, my userid is $(whoami), and my directory is $PWD"
+   
+    # '!' groovy variable interpolation; '$' bash variable/process interpolation: 
+    echo -n "!{word} world, i'm $(whoami), and my directory is '$PWD'"
 
     '''
 }
@@ -54,11 +65,10 @@ process say_it {
 workflow {
 
   // create a 'value' channel with several items in it:
-
-  ch_in = channel.of('hello', 'hallo', 'hola', 'bonjour')
+  ch_in = channel.of('hello', 'ciao', 'hola', 'bonjour')
+  ch_in.subscribe({ println("ch_in: $it") })
 
   // process each item in parallel; output orders can vary base on run times!!!
-
   ch_out = say_it(ch_in)
   ch_out.subscribe({ print("ch_out: $it") })
 }
