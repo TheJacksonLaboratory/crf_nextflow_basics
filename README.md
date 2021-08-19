@@ -85,10 +85,10 @@ The process execution subdirectory file `.command.sh` contains the `shell:` scri
   executed by nextflow, which includes the step in which the `.command.sh` script is 
   called. Other details in `.command.run` include loading of specified **modules** 
   (e.g. `singularity`) and the command lines used to load containers, including 
-  container **directory bindings**. The file `.command.out` contains process 
+  **container directory bindings**. The file `.command.out` contains process 
   output to `stdout`, and `stderr` output is found in `.command.err`. In addition,
-  there is a `.command.log`, which contains the same output as `.command.out`, but
-  adds in output from e.g. the job queueing system (slurm on Sumner).
+  there is a `.command.log` file, which contains the same output as `.command.out`, 
+  but adds in output from e.g. the job queueing system (slurm on Sumner).
 
 Nextflow outputs can be cleaned up by runnning `rm -r .nextflow* work` in the 
   directory from which nextflow was invoked.
@@ -115,13 +115,13 @@ This script is pure Groovy (an extension of Java), without any Nextflow-isms,
 
 An un-named workflow marks the entry point for most nextflow dsl2 scripts; that workflow
   can create channels, pass them to named processes or named workflows, and capture
-  output in order to pass to another process/workflow, etc. In this case, the
+  output in order to pass to another process/workflow, etc. In this script, the
   un-named workflow builds a 'value channel' with several 'items' (one word per 
   language) in it and passes it to a process which makes a separate greeting string 
   for each item.
 
 This script does not create any files explicitly, but just outputs the greetings
-  to stdout.  Each process execution (one per item in the process input channel)
+  to `stdout`.  Each process execution (one per item in the process input channel)
   will run under `work/` in a dedicated subdirectory. You can run `find work/` to 
   see the files deposited there, which are all hidden and begin with `.command`
   or `.exitcode`. If this script had explicit output files, those would appear in 
@@ -133,10 +133,10 @@ This script does not create any files explicitly, but just outputs the greetings
 
 This script demonstrates a problematic situation that can occur when a workflow
   branches, but the output of the branches needs to be combined so that all 
-  outputs for a given input channel item can be brought back together.
+  outputs for a given item in the input channel can be brought back together.
 
-In this case, files are generated that contain greetings in different languages.
-  Then several types of checksum files are generated for each greeting file. This 
+In this case, files are generated that contain greetings in different languages
+  (one greeting per input word). Then several types of checksum files are generated for each greeting file. This 
   script shows how a naive approach can result in ambiguities when trying to
   combine the greeting file channel with the checksum file channel so that 
   the greeting file is correctly grouped with the corresponding checksum files.
@@ -158,9 +158,9 @@ This script does generate output files at each step, which you can see by runnin
 In this example, we show how more complex item types (specifically tuples) can 
   be used to pass grouping variables through a process that can be used to 
   aggregate data from different processes for each group and associate outputs
-  with inputs.
+  with inputs (the problem introduced in the last example).
 
-Tuples are a groovy data type for an ordered, immutable (cannot change/add/delete 
+Tuples are a Groovy data type for an ordered, immutable (cannot change/add/delete 
   elements) list of objects of arbitrary (and potentially different) types.
   Often (as below) we will use channel whose items are tuples composed of one or more 
   grouping variables (type 'val'), along with a list of one or more path objects
@@ -182,7 +182,7 @@ This example also introduces the use of stubs for quickly prototyping and
   debugging channel operations. If we know what output files a process produces,
   we can mock those outputs using a `stub:` section within the corresponding
   process. Running these stubs lets us work out the code for channel manipulations
-  without having to run the actual production process, which can be very helpful in
+  without having to run the actual production process, which can be helpful in
   cases where that production process takes a long time to complete. In order to
   execute just the stubs, we run the script using `nextflow run -stub hello_files3.nf`.
   This results in the `stub:` block being executed for each process in place of the 
@@ -193,6 +193,7 @@ This example also introduces the use of stubs for quickly prototyping and
   (since the `stub:` script used the `touch` command to make the output files in 
   this case). But this is enough for checking that the channel structures are as
   expected at each step in the pipeline. Once the code is worked out with stubs, 
-  you can then run the production code to check the `script:` blocks. 
+  you can then run the production code to check the `script:` blocks, after which
+  everything should be working. 
 
 
