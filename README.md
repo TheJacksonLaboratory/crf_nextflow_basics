@@ -1,7 +1,7 @@
 # Nextflow basics
 
-This repo contains a series of relatively simple nextflow pipelines intended to
-  demonstrate some basic properties of nextflow workflows and some common 
+This repo contains a series of relatively simple Nextflow pipelines intended to
+  demonstrate some basic properties of Nextflow workflows and some common 
   situations that can be solved using channel operators. The examples are meant
   to be studied in the following order: `hello_minimal.nf`, `hello_vals.nf`, 
   `hello_files1.nf`, `hello_files2.nf`, and `hello_files3.nf`. They are written 
@@ -10,12 +10,12 @@ This repo contains a series of relatively simple nextflow pipelines intended to
 
 ---
 
-## About nextflow
+## About Nextflow
 
 Nextflow documentation can be found at https://www.nextflow.io/docs/latest/index.html.
   Nextflow is built on top of the Groovy programming language, whose documentation
   can be found here: https://groovy-lang.org/documentation.html. Groovy, in turn, is a
-  superset of the Java programming language. The system-wide java installed on
+  superset of the Java programming language. The system-wide Java installed on
   Sumner is Java 8, which is documented at https://docs.oracle.com/javase/8/docs/api/.
 
 A concise summary of commonly used Groovy syntax can be found within the Nextflow
@@ -42,11 +42,11 @@ Nextflow adds to Groovy the concepts of `process`, `channel` and a set of operat
 
 ---
 
-## Installing nextflow
+## Installing Nextflow
 
 Installation instructions can be found here: https://www.nextflow.io/docs/latest/getstarted.html
 
-In the following code block, we demo how to install nextflow in your home directory. The 
+In the following code block, we demo how to install Nextflow in your home directory. The 
   subdirectory names `~/opt` and `~/bin` are arbitrary. **It is also assumed that `~/bin` is
   in your `PATH`.** If not, you can add it in `~/.bashrc`, then `source ~/.bashrc` to load 
   the change into your current environment. 
@@ -59,19 +59,19 @@ mkdir -p ~/bin
 ln -s $(pwd)/nextflow ~/bin
 cd
 which nextflow      ## should point back to ~/bin
-nextflow -v         ## check install by invoking nextflow, getting version
+nextflow -v         ## check install by invoking Nextflow, getting version
 
 ```
 
 ---
 
-## Running nextflow
+## Running Nextflow
 
 Each script can be run using the syntax: `nextflow run hello_<x>.nf`. This 
   will result in the hidden file `.nextflow.log`, the hidden subdirectory 
   `.nextflow/` and the subdirectory `work/` being created in the directory from which
-  nextflow was invoked. The `.nextflow.log` file can be consulted for details
-  in the case of errors. The `.nextflow` directory is used by nextflow itself,
+  Nextflow was invoked. The `.nextflow.log` file can be consulted for details
+  in the case of errors. The `.nextflow` directory is used by Nextflow itself,
   and the `work/` directory contains a separate subdirectory for every execution
   of every process. Each such subdirectory will have a series of hidden files 
   matching the pattern `.command.*`, as well as a file named `.exitcode` which 
@@ -80,9 +80,9 @@ Each script can be run using the syntax: `nextflow run hello_<x>.nf`. This
   whatever name the process assigns.
 
 The process execution subdirectory file `.command.sh` contains the `shell:` script 
-  block, after interpolation of groovy variables, and can be useful for debugging 
+  block, after interpolation of Groovy variables, and can be useful for debugging 
   the interpolation process. The `.command.run` file contains the actual shell script 
-  executed by nextflow, which includes the step in which the `.command.sh` script is 
+  executed by Nextflow, which includes the step in which the `.command.sh` script is 
   called. Other details in `.command.run` include loading of specified **modules** 
   (e.g. `singularity`) and the command lines used to load containers, including 
   **container directory bindings**. The file `.command.out` contains process 
@@ -91,7 +91,7 @@ The process execution subdirectory file `.command.sh` contains the `shell:` scri
   but adds in output from e.g. the job queueing system (slurm on Sumner).
 
 Nextflow outputs can be cleaned up by runnning `rm -r .nextflow* work` in the 
-  directory from which nextflow was invoked.
+  directory from which Nextflow was invoked.
 
 ---
 
@@ -101,11 +101,11 @@ Nextflow outputs can be cleaned up by runnning `rm -r .nextflow* work` in the
 
 This script is pure Groovy (an extension of Java), without any Nextflow-isms, 
   other than the shebang line at the top of the script. Nevertheless, this script 
-  can be run just like a regular nextflow script, using the command 
-  `nextflow run /path/to/hello_minimal.nf`. As with all nextflow runs, a 
+  can be run just like a regular Nextflow script, using the command 
+  `nextflow run /path/to/hello_minimal.nf`. As with all Nextflow runs, a 
   `.nextflow.log` file, a `.nextflow/` directory, and a `work/` directory are 
-  created in the directory from which nextflow was invoked. This script does not 
-  have any nextflow `processes` defined, so no subdirectories or files are 
+  created in the directory from which Nextflow was invoked. This script does not 
+  have any Nextflow `processes` defined, so no subdirectories or files are 
   introduced into `work/`, which remains empty when the job completes. Instead, 
   the outputs are simply printed to the console/stdout.
 
@@ -113,7 +113,7 @@ This script is pure Groovy (an extension of Java), without any Nextflow-isms,
 
 ### hello\_vals.nf
 
-An un-named workflow marks the entry point for most nextflow dsl2 scripts; that workflow
+An un-named workflow marks the entry point for most Nextflow dsl2 scripts; that workflow
   can create channels, pass them to named processes or named workflows, and capture
   output in order to pass to another process/workflow, etc. In this script, the
   un-named workflow builds a 'value channel' with several 'items' (one word per 
@@ -136,13 +136,13 @@ This script demonstrates a problematic situation that can occur when a workflow
   outputs for a given item in the input channel can be brought back together.
 
 In this case, files are generated that contain greetings in different languages
-  (one greeting per input word). Then several types of checksum files are generated for each greeting file. This 
-  script shows how a naive approach can result in ambiguities when trying to
-  combine the greeting file channel with the checksum file channel so that 
-  the greeting file is correctly grouped with the corresponding checksum files.
-  How are we to get the outputs from `ch_hello` and `ch_sums` combined together
-  again, and how do we keep track of which greeting corresponds to each 
-  resulting set of outputs?
+  (one greeting per input word). Then several types of checksum files are 
+  generated for each greeting file. This script shows how a naive approach can 
+  result in ambiguities when trying to combine the greeting file channel with 
+  the checksum file channel so that the greeting file is correctly grouped with 
+  the corresponding checksum files. How are we to get the outputs from 
+  `ch_hello` and `ch_sums` combined together again, and how do we keep track of 
+  which greeting corresponds to each resulting set of outputs?
 
 This script does generate output files at each step, which you can see by running
   `find work`. Note that the output files are named identically in each directory,
