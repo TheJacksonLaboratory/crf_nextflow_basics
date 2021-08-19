@@ -46,6 +46,11 @@ Nextflow adds to Groovy the concepts of `process`, `channel` and a set of operat
 
 Installation instructions can be found here: https://www.nextflow.io/docs/latest/getstarted.html
 
+Nextflow requires Java version 8 or later, which can be downloaded from
+  https://www.oracle.com/java/technologies/javase-downloads.html. The Java Runtime Edition (JRE)
+  is sufficient, though you may want to get the Java Development Kit (JDK) instead, if you 
+  want to also compile your own Java programs into bytecode or make `.jar` files.
+
 In the following code block, we demo how to install Nextflow in your home directory. The 
   subdirectory names `~/opt` and `~/bin` are arbitrary. **It is also assumed that `~/bin` is
   in your `PATH`.** If not, you can add it in `~/.bashrc`, then `source ~/.bashrc` to load 
