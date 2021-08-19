@@ -8,7 +8,34 @@ This repo contains a series of relatively simple nextflow pipelines intended to
 
 ---
 
+## About nextflow
+
+Nextflow documentation can be found at `https://www.nextflow.io/docs/latest/index.html`.
+  Nextflow is built on top of the Groovy programming language, whose documentation
+  can be found here: https://groovy-lang.org/documentation.html. Groovy, in turn, is a
+  superset of the Java programming language. The system-wide java installed on
+  Sumner is Java 8, which is documented at https://docs.oracle.com/javase/8/docs/api/.
+
+A concise summary of commonly used Groovy syntax can be found within the Nextflow
+  documentation (https://www.nextflow.io/docs/latest/script.html).
+
+---
+
 ## Installing nextflow
+
+Installation instructions can be found here: https://www.nextflow.io/docs/latest/getstarted.html
+
+In the following code block, we demo how to install nextflow in your home directory. The 
+  subdirectory names (`~/opt` and `~/bin`) are arbitrary:
+
+```
+mkdir -p ~/opt/nextflow
+cd ~/opt/nextflow
+curl -s https://get.nextflow.io | bash
+mkdir -p ~/bin
+ln -s $(pwd)/nextflow ~/bin
+
+```
 
 ---
 
@@ -98,8 +125,9 @@ Tuples are a groovy data type for an ordered, immutable (cannot change/add/delet
 ### hello\_files3.nf
 
 This example extends the previous one by taking the input channel items and
-  processing them separately with one process (`say_it` and `check_sums`), but also
-  processes them all together in another process (`greet_list`). We then combine
-  the outputs from all three processes into the final output channel, `ch_reformat`.
+  processing them separately with one series of processes (`say_it` and 
+  `check_sums`), but also processes them all together in another process 
+  (`greet_list`). We then combine the outputs from all three processes into the 
+  final output channel, `ch_reformat`.
 
 
