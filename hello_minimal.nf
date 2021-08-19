@@ -23,6 +23,8 @@ multi-line comment end: */
 // initialize a groovy variable; type inferred from assignment rvalue:
 greetings = [ 'hello', 'ciao', 'hola', 'bonjour' ]
 
+println()       // blank-line to output for better readability
+
 for(greeting : greetings) {
   println("$greeting within 2x quotes, with parens!")
   println "$greeting within 2x quotes, without parens!"
