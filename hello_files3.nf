@@ -20,6 +20,11 @@ process say_it {
     '''
     echo "!{word} world, my userid is $(whoami)" > hello.out
     '''
+
+  stub:
+    """
+    touch hello.txt
+    """
 }
 
 process check_sums {
@@ -34,6 +39,14 @@ process check_sums {
     sha256sum '!{file_in}' > '!{file_in}.sha256'
     sha512sum '!{file_in}' > '!{file_in}.sha512'
     '''
+
+  // going back to 2x quotes, so groovy variables interpolated w/ "${x}" syntax:
+  stub:
+    """
+    touch ${file_in}.md5
+    touch ${file_in}.sha256
+    touch ${file_in}.sha512
+    """
 }
 
 process greet_list {
@@ -45,6 +58,11 @@ process greet_list {
     '''
     echo "greeting words: !{words_in}" > 'words.out'
     '''
+
+  stub:
+    """
+    touch words.out
+    """
 }
 
 workflow {
