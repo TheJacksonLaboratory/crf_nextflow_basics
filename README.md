@@ -4,20 +4,41 @@ This repo contains a series of relatively simple nextflow pipelines intended to
   demonstrate some basic properties of nextflow workflows and some common 
   situations that can be solved using channel operators. The examples are meant
   to be studied in the following order: `hello_minimal.nf`, `hello_vals.nf`, 
-  `hello_files1.nf`, `hello_files2.nf`, and `hello_files3.nf`.
+  `hello_files1.nf`, `hello_files2.nf`, and `hello_files3.nf`. They are written 
+  using the recently introduced dsl2 syntax, which will become the default syntax
+  in comming years.
 
 ---
 
 ## About nextflow
 
-Nextflow documentation can be found at `https://www.nextflow.io/docs/latest/index.html`.
+Nextflow documentation can be found at https://www.nextflow.io/docs/latest/index.html.
   Nextflow is built on top of the Groovy programming language, whose documentation
   can be found here: https://groovy-lang.org/documentation.html. Groovy, in turn, is a
   superset of the Java programming language. The system-wide java installed on
   Sumner is Java 8, which is documented at https://docs.oracle.com/javase/8/docs/api/.
 
 A concise summary of commonly used Groovy syntax can be found within the Nextflow
-  documentation (https://www.nextflow.io/docs/latest/script.html).
+  documentation at https://www.nextflow.io/docs/latest/script.html. Groovy is essentially
+  a relaxed superset of Java, which does not require explicit type declarations, and
+  drastically reduces the need for semicolons and parantheses in expressions. 
+
+Nextflow adds to Groovy the concepts of `process`, `channel` and a set of operators for 
+  channel objects. A pipeline is a series of processes which are tied together by 
+  channels. The pipelines can be linear, in which case they can be quite simple to write. 
+  However, in many cases, you may want the workflow to branch, then collect all the 
+  outputs from the different branches into a final output dataset. In some cases, the 
+  data from a branching workflow needs to be brought together into subsets corresponding 
+  to e.g. individual inputs. This case, which is illustrated in example `hello_files1.nf`, 
+  can be tackled in a variety of ways. One relatively clean and efficient way to do it is 
+  by passing a grouping variable with each set of files, as outlined in `hello_files2.nf`, 
+  and extended to a slightly more complex situation in `hello_files3.nf`. This solution
+  requires familiarity with basic channel operators, which are introduced in the scripts.
+  Working out your code so that the channels have the right contents can take quite a bit
+  of work, and testing it by actually running each process can be very time consuming, if 
+  any process takes a long time to run. Instead, we can use our knowledge of what files 
+  are produced by each process to mock that process during code testing. This can be done
+  using `stubs`, which are demonstrated in `hello_files3.nf`.
 
 ---
 
@@ -26,7 +47,9 @@ A concise summary of commonly used Groovy syntax can be found within the Nextflo
 Installation instructions can be found here: https://www.nextflow.io/docs/latest/getstarted.html
 
 In the following code block, we demo how to install nextflow in your home directory. The 
-  subdirectory names (`~/opt` and `~/bin`) are arbitrary:
+  subdirectory names `~/opt` and `~/bin` are arbitrary. It is also assumed that `~/bin` is
+  in your `PATH`. If not, you can add it in `~/.bashrc`, then `source ~/.bashrc` to load 
+  the change into your current environment. 
 
 ```
 mkdir -p ~/opt/nextflow
@@ -64,14 +87,14 @@ The file `.command.sh` contains the `shell:` script block, after interpolation o
 
 ### hello\_minimal.nf
 
-This script is pure groovy (an extension of java), without any nextflowisms, 
+This script is pure Groovy (an extension of Java), without any Nextflow-isms, 
   other than the shebang line at the top of the script. Nevertheless, this script 
   can be run just like a regular nextflow script, using the command 
   `nextflow run /path/to/hello_minimal.nf`. As with all nextflow runs, a 
   `.nextflow.log` file, a `.nextflow/` directory, and a `work/` directory are 
   created in the directory from which nextflow was invoked. This script does not 
   have any nextflow `processes` defined, so no subdirectories or files are 
-  introduced into `work/`, and it remains empty when the job completes. Instead, 
+  introduced into `work/`, which remains empty when the job completes. Instead, 
   the outputs are simply printed to the console/stdout.
 
 ---
