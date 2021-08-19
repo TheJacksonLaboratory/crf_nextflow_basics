@@ -66,6 +66,7 @@ workflow {
 
   // create a 'value' channel with several items in it:
   ch_in = channel.of('hello', 'ciao', 'hola', 'bonjour')
+  // one way to inspect each item in any channel:
   ch_in.subscribe({ println("ch_in: $it") })
 
   // process each item in parallel; output orders can vary base on run times!!!
