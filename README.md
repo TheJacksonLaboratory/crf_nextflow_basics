@@ -100,14 +100,14 @@ Nextflow outputs can be cleaned up by runnning `rm -r .nextflow* work` in the
 ### hello\_minimal.nf
 
 This script is pure Groovy (an extension of Java), without any Nextflow-isms, 
-  other than the shebang line at the top of the script. Nevertheless, this script 
-  can be run just like a regular Nextflow script, using the command 
-  `nextflow run /path/to/hello_minimal.nf`. As with all Nextflow runs, a 
-  `.nextflow.log` file, a `.nextflow/` directory, and a `work/` directory are 
-  created in the directory from which Nextflow was invoked. This script does not 
-  have any Nextflow `processes` defined, so no subdirectories or files are 
-  introduced into `work/`, which remains empty when the job completes. Instead, 
-  the outputs are simply printed to the console/stdout.
+  other than the shebang line `#!/usr/bin/env nextflow` at the top of the script. 
+  Nevertheless, this script can be run just like a regular Nextflow script, 
+  using the command `nextflow run /path/to/hello_minimal.nf`. As with all 
+  Nextflow runs, a `.nextflow.log` file, a `.nextflow/` directory, and a `work/` 
+  directory are created in the directory from which Nextflow was invoked. This 
+  script does not have any Nextflow `processes` defined, so no subdirectories or 
+  files are introduced into `work/`, which remains empty when the job completes. 
+  Instead, the outputs are simply printed to the console/stdout.
 
 ---
 
