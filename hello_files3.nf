@@ -23,7 +23,7 @@ process say_it {
 
   stub:
     """
-    touch hello.txt
+    touch hello.out
     """
 }
 
@@ -68,32 +68,32 @@ process greet_list {
 workflow {
 
   ch_in = channel.of('hello', 'ciao', 'hola', 'bonjour')
-  ch_in.subscribe({ println("ch_in: $it") })
+  ch_in.subscribe({ println("ch_in: $it\n") })
 
   // the 'collect()' operator collects all channel items and 
   //   returns them as single list item:
 
   ch_list = greet_list(ch_in.collect())
-  ch_list.subscribe({ println("ch_list: $it") })
+  ch_list.subscribe({ println("ch_list: $it\n") })
 
   ch_hello = say_it(ch_in)
-  ch_hello.subscribe({ println("ch_hello: $it") })
+  ch_hello.subscribe({ println("ch_hello: $it\n") })
 
   ch_sums = check_sums(ch_hello)
-  ch_sums.subscribe({ println("ch_sums: $it") })
+  ch_sums.subscribe({ println("ch_sums: $it\n") })
 
   // combine() operator combines all items from one channel
   //   with all items in a second channel:
 
   ch_join1 = ch_hello.combine(ch_list)
-  ch_join1.subscribe({ println("ch_join1: $it") })
+  ch_join1.subscribe({ println("ch_join1: $it\n") })
 
   // join() operator combines all items in two channels based 
   //   on grouping key which is (by default) first element in 
   //   each item:
 
   ch_join2 = ch_sums.join(ch_join1)
-  ch_join2.subscribe({ println("ch_join2: $it") })
+  ch_join2.subscribe({ println("ch_join2: $it\n") })
 
   ch_reformat = ch_join2.map({
     key = it.get(0)
@@ -102,6 +102,6 @@ workflow {
     val.add(it.get(3))
     return tuple(key, val)
   })
-  ch_reformat.subscribe({ println("ch_reformat: $it") })
+  ch_reformat.subscribe({ println("ch_reformat: $it\n") })
 }
 

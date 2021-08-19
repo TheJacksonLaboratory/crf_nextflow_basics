@@ -37,7 +37,7 @@ Nextflow adds to Groovy the concepts of `process`, `channel` and a set of operat
   Working out your code so that the channels have the right contents can take quite a bit
   of work, and testing it by actually running each process can be very time consuming, if 
   any process takes a long time to run. Instead, we can use our knowledge of what files 
-  are produced by each process to mock that process during code testing. This can be done
+  are expected from each process to mock that process during code testing. This can be done
   using `stubs`, which are demonstrated in `hello_files3.nf`.
 
 ---
@@ -47,8 +47,8 @@ Nextflow adds to Groovy the concepts of `process`, `channel` and a set of operat
 Installation instructions can be found here: https://www.nextflow.io/docs/latest/getstarted.html
 
 In the following code block, we demo how to install nextflow in your home directory. The 
-  subdirectory names `~/opt` and `~/bin` are arbitrary. It is also assumed that `~/bin` is
-  in your `PATH`. If not, you can add it in `~/.bashrc`, then `source ~/.bashrc` to load 
+  subdirectory names `~/opt` and `~/bin` are arbitrary. **It is also assumed that `~/bin` is
+  in your `PATH`.** If not, you can add it in `~/.bashrc`, then `source ~/.bashrc` to load 
   the change into your current environment. 
 
 ```
@@ -57,6 +57,9 @@ cd ~/opt/nextflow
 curl -s https://get.nextflow.io | bash
 mkdir -p ~/bin
 ln -s $(pwd)/nextflow ~/bin
+cd
+which nextflow      ## should point back to ~/bin
+nextflow -v         ## check install by invoking nextflow, getting version
 
 ```
 
@@ -65,21 +68,30 @@ ln -s $(pwd)/nextflow ~/bin
 ## Running nextflow
 
 Each script can be run using the syntax: `nextflow run hello_<x>.nf`. This 
-  will result in the hidden file `.nextflow.log`, the hidden directory 
-  `.nextflow/` and the directory `work/` being created in the directory from which
+  will result in the hidden file `.nextflow.log`, the hidden subdirectory 
+  `.nextflow/` and the subdirectory `work/` being created in the directory from which
   nextflow was invoked. The `.nextflow.log` file can be consulted for details
   in the case of errors. The `.nextflow` directory is used by nextflow itself,
   and the `work/` directory contains a separate subdirectory for every execution
   of every process. Each such subdirectory will have a series of hidden files 
   matching the pattern `.command.*`, as well as a file named `.exitcode` which 
-  contains the numeric exitcode of the corresponding process. 
+  contains the numeric exitcode of the corresponding process. In addition, if the
+  process produces output files, they will be found in this subdirectory under 
+  whatever name the process assigns.
 
-The file `.command.sh` contains the `shell:` script block, after interpolation of 
-  groovy variables. The `.command.run` file contains the actual shell script
-  executed by nextflow, which includes a step in which the `.command.sh` script
-  is executed. Other details in `.command.run` include loading of specified
-  modules (e.g. `singularity`) and the command lines used to load containers,
-  including directory bindings.
+The process execution subdirectory file `.command.sh` contains the `shell:` script 
+  block, after interpolation of groovy variables, and can be useful for debugging 
+  the interpolation process. The `.command.run` file contains the actual shell script 
+  executed by nextflow, which includes the step in which the `.command.sh` script is 
+  called. Other details in `.command.run` include loading of specified **modules** 
+  (e.g. `singularity`) and the command lines used to load containers, including 
+  container **directory bindings**. The file `.command.out` contains process 
+  output to `stdout`, and `stderr` output is found in `.command.err`. In addition,
+  there is a `.command.log`, which contains the same output as `.command.out`, but
+  adds in output from e.g. the job queueing system (slurm on Sumner).
+
+Nextflow outputs can be cleaned up by runnning `rm -r .nextflow* work` in the 
+  directory from which nextflow was invoked.
 
 ---
 
@@ -128,6 +140,16 @@ In this case, files are generated that contain greetings in different languages.
   script shows how a naive approach can result in ambiguities when trying to
   combine the greeting file channel with the checksum file channel so that 
   the greeting file is correctly grouped with the corresponding checksum files.
+  How are we to get the outputs from `ch_hello` and `ch_sums` combined together
+  again, and how do we keep track of which greeting corresponds to each 
+  resulting set of outputs?
+
+This script does generate output files at each step, which you can see by running
+  `find work`. Note that the output files are named identically in each directory,
+  which is the nexflow way of doing things (don't need complex file naming logic
+  to keep outputs separated -- use different output directories instead), but can
+  result in ambiguities when trying to track the outputs back to the corresponding
+  inputs.
 
 ---
 
@@ -135,13 +157,16 @@ In this case, files are generated that contain greetings in different languages.
 
 In this example, we show how more complex item types (specifically tuples) can 
   be used to pass grouping variables through a process that can be used to 
-  aggregate data from different processes for each group.
+  aggregate data from different processes for each group and associate outputs
+  with inputs.
 
 Tuples are a groovy data type for an ordered, immutable (cannot change/add/delete 
   elements) list of objects of arbitrary (and potentially different) types.
   Often (as below) we will use channel whose items are tuples composed of one or more 
   grouping variables (type 'val'), along with a list of one or more path objects
-  (type 'path').
+  (type 'path'). So our channels are often defined as `tuple val(group), path(files)`,
+  where `group` will receive a grouping variable (typically a `String`) and `files`
+  will be either a single `Path` object or an `ArrayList` of `Path` objects.
 
 ---
 
@@ -151,6 +176,23 @@ This example extends the previous one by taking the input channel items and
   processing them separately with one series of processes (`say_it` and 
   `check_sums`), but also processes them all together in another process 
   (`greet_list`). We then combine the outputs from all three processes into the 
-  final output channel, `ch_reformat`.
+  final output channel, `ch_reformat`. 
+
+This example also introduces the use of stubs for quickly prototyping and
+  debugging channel operations. If we know what output files a process produces,
+  we can mock those outputs using a `stub:` section within the corresponding
+  process. Running these stubs lets us work out the code for channel manipulations
+  without having to run the actual production process, which can be very helpful in
+  cases where that production process takes a long time to complete. In order to
+  execute just the stubs, we run the script using `nextflow run -stub hello_files3.nf`.
+  This results in the `stub:` block being executed for each process in place of the 
+  process's `shell:` block. For production, we still run the script with the usual
+  `nextflow run hello_files3.nf` invocation, in which case the `shell:` blocks are
+  run and `stub:` blocks are skipped. If we run with the `-stub` option, the
+  `work/` directory will have all the expected files, but they will all be empty
+  (since the `stub:` script used the `touch` command to make the output files in 
+  this case). But this is enough for checking that the channel structures are as
+  expected at each step in the pipeline. Once the code is worked out with stubs, 
+  you can then run the production code to check the `script:` blocks. 
 
 

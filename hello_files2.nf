@@ -51,18 +51,18 @@ process check_sums {
 workflow {
 
   ch_in = channel.of('hello', 'ciao', 'hola', 'bonjour')
-  ch_in.subscribe({ println("ch_in: $it") })
+  ch_in.subscribe({ println("ch_in: $it\n") })
 
   ch_hello = say_it(ch_in)
-  ch_hello.subscribe({ println("ch_hello: $it") })
+  ch_hello.subscribe({ println("ch_hello: $it\n") })
 
   ch_sums = check_sums(ch_hello)
-  ch_sums.subscribe({ println("ch_sums: $it") })
+  ch_sums.subscribe({ println("ch_sums: $it\n") })
 
   // join channels on (by default) first element (grouping key) in each tuple:
 
   ch_join = ch_sums.join(ch_hello)
-  ch_join.subscribe({ println("ch_join: $it") })
+  ch_join.subscribe({ println("ch_join: $it\n") })
 
   // ch_join tuples are tuple(val, list(path), path); here, convert to 
   //   tuple(val, list(path)), by taking third element (the last path) and
@@ -75,6 +75,6 @@ workflow {
     val.add(it.get(2))
     return tuple(key, val)
   })
-  ch_reformat.subscribe({ println("ch_reformat: $it") })
+  ch_reformat.subscribe({ println("ch_reformat: $it\n") })
 }
 
