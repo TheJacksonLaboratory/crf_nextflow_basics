@@ -81,7 +81,7 @@ Each script can be run using the syntax: `nextflow run hello_<x>.nf`. This
 
 The process execution subdirectory file `.command.sh` contains the `shell:` script 
   block, after interpolation of Groovy variables, and can be useful for debugging 
-  the interpolation process. The `.command.run` file contains the actual shell script 
+  the interpolation process. The `.command.run` file contains the actual bash script 
   executed by Nextflow, which includes the step in which the `.command.sh` script is 
   called. Other details in `.command.run` include loading of specified **modules** 
   (e.g. `singularity`) and the command lines used to load containers, including 
@@ -116,9 +116,10 @@ This script is pure Groovy (an extension of Java), without any Nextflow-isms,
 An un-named workflow marks the entry point for most Nextflow dsl2 scripts; that workflow
   can create channels, pass them to named processes or named workflows, and capture
   output in order to pass to another process/workflow, etc. In this script, the
-  un-named workflow builds a 'value channel' with several 'items' (one word per 
-  language) in it and passes it to a process which makes a separate greeting string 
-  for each item.
+  un-named workflow builds a 'value channel' with several 'items' (in this example,
+  each item is one word from a different language) in it and passes it to a process 
+  which makes a separate greeting string for each item in the input channel. Each 
+  resulting greeting becomes a single item in the output channel.
 
 This script does not create any files explicitly, but just outputs the greetings
   to `stdout`.  Each process execution (one per item in the process input channel)
@@ -147,9 +148,9 @@ In this case, files are generated that contain greetings in different languages
 This script does generate output files at each step, which you can see by running
   `find work`. Note that the output files are named identically in each directory,
   which is the nexflow way of doing things (don't need complex file naming logic
-  to keep outputs separated -- use different output directories instead), but can
-  result in ambiguities when trying to track the outputs back to the corresponding
-  inputs.
+  to keep outputs separated -- Nextflow instead automatically uses different output 
+  directories for each input item instead), but can result in ambiguities when 
+  trying to track the outputs back to the corresponding inputs.
 
 ---
 
@@ -163,23 +164,23 @@ In this example, we show how more complex item types (specifically tuples) can
 Tuples are a Groovy data type for an ordered, immutable (cannot change/add/delete 
   elements) list of objects of arbitrary (and potentially different) types.
   Often (as below) we will use channel whose items are tuples composed of one or more 
-  grouping variables (type 'val'), along with a list of one or more path objects
-  (type 'path'). So our channels are often defined as `tuple val(group), path(files)`,
+  grouping variables (type `val`), along with a list of one or more path objects
+  (type `path`). So our channels are often defined as `tuple val(group), path(files)`,
   where `group` will receive a grouping variable (typically a `String`) and `files`
-  will be either a single `Path` object or an `ArrayList` of `Path` objects.
+  will get set to either a single `Path` object or an `ArrayList` of `Path` objects.
 
 ---
 
 ### hello\_files3.nf
 
 This example extends the previous one by taking the input channel items and
-  processing them separately with one series of processes (`say_it` and 
+  processing them separately with two sequential processes (`say_it` and 
   `check_sums`), but also processes them all together in another process 
   (`greet_list`). We then combine the outputs from all three processes into the 
   final output channel, `ch_reformat`. 
 
 This example also introduces the use of stubs for quickly prototyping and
-  debugging channel operations. If we know what output files a process produces,
+  debugging channel configurations. If we know what output files a process produces,
   we can mock those outputs using a `stub:` section within the corresponding
   process. Running these stubs lets us work out the code for channel manipulations
   without having to run the actual production process, which can be helpful in
