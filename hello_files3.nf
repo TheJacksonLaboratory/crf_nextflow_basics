@@ -21,6 +21,7 @@ process say_it {
     echo "!{word} world, my userid is $(whoami)" > hello.out
     '''
 
+  // going back to 2x quotes, so groovy variables interpolated w/ "${x}" syntax:
   stub:
     """
     touch hello.out
@@ -40,7 +41,6 @@ process check_sums {
     sha512sum '!{file_in}' > '!{file_in}.sha512'
     '''
 
-  // going back to 2x quotes, so groovy variables interpolated w/ "${x}" syntax:
   stub:
     """
     touch ${file_in}.md5
